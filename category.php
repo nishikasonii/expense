@@ -5,13 +5,12 @@ include_once("functions.php");
 checkUser();
 include_once("user_header.php");
 
-if(isset($_GET['type']) && $_GET['type']=="delete" && isset($_GET['id']) && $_GET['id']>0){
+if (isset($_GET['id']) && $_GET['id']>0){
     $id=get_safe_value($_GET['id']);
-    echo $id;
-    
+    mysqli_query($conn, "DELETE FROM category WHERE id=$id");
 }
 
-$res=mysqli_query($conn, "SELECT * FROM category"); 
+$res=mysqli_query($conn, "SELECT * FROM category ORDER BY id DESC"); 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,14 +21,15 @@ $res=mysqli_query($conn, "SELECT * FROM category");
 </head>
 <body>
     <h2>Category</h2>
+    <a href="manage_category.php">Add Category</a><br><br>
     <?php
         if(mysqli_num_rows($res)>0){
     ?>
-    <table>
+    <table border=1>
         <tr>
             <td>ID</td>
             <td>Name</td>
-            <td>Edit Delete</td>
+            <td>Action</td>
             <!-- <td>Delete</td> -->
         </tr>
 
@@ -40,7 +40,7 @@ $res=mysqli_query($conn, "SELECT * FROM category");
             <td><?php echo $row['id']; ?></td>
             <td><?php echo $row['name']; ?></td>
             <td>
-                <a href="? id=<?php echo $row['id']; ?>">Edit</a>
+                <a href="manage_category.php ? & id=<?php echo $row['id']; ?>">Edit</a>
                 <a href="?type=delete & id=<?php echo $row['id']; ?>">Delete</a>
             </td>
         </tr>
