@@ -9,7 +9,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>Header</title> -->
+    <style>
+        h1{
+            font-size: 35px;
+            color: #0085A1;
+        }
+    </style>
 </head>
 
 <body>

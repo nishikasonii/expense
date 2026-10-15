@@ -3,6 +3,7 @@ include_once("config.php");
 include_once("header.php");
 include_once("functions.php");
 checkUser();
+userArea();
 include_once("user_header.php");
 
 $msg="";
@@ -19,13 +20,23 @@ if(isset($_GET['id']) && $_GET['id']>0){
     $label="Edit";
     $id=get_safe_value($_GET["id"]);
     $res=mysqli_query($conn, "SELECT * FROM expense WHERE id=$id");
+    
+    if(mysqli_num_rows($res)==0){
+        redirect("expense.php");
+        die();
+    }
+    
     $row=mysqli_fetch_assoc($res);
+    
     $category_id=$row['category_id'];
     $item=$row['item'];
     $price=$row['price'];
     $details=$row['details'];
     $expense_date=$row['expense_date'];
-    $added_on=$row['added_on'];
+    
+    if($row['added_by'] != $_SESSION['uid']){
+        redirect("expense.php");
+    }
 }
 
 if(isset($_POST["submit"])){
@@ -44,7 +55,8 @@ if(isset($_POST["submit"])){
         $type="edit";
         $sub_sql="AND id!=$id";
     }
-    $sql="INSERT INTO expense(category_id, item, price, details, expense_date, added_on) VALUES('$category_id', '$item', '$price', '$details', '$expense_date', '$added_on')";
+    $added_by=$_SESSION["uid"];
+    $sql="INSERT INTO expense(category_id, item, price, details, expense_date, added_on, added_by) VALUES('$category_id', '$item', '$price', '$details', '$expense_date', '$added_on', '$added_by')";
     if(isset($_GET['id']) && $_GET['id']>0){
         $sql="UPDATE category SET category_id='$category_id', item='$item', price='$price', details='$details', expense_date='$expense_date' WHERE id=$id";
     }
@@ -59,10 +71,99 @@ if(isset($_POST["submit"])){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $label; ?>Expense</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f7fa;
+        margin: 0;
+        padding-left: 20px;
+        color: #333;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        color: #0085A1;
+        margin-bottom: 15px;
+        font-size: 30px;
+    }
+
+    a {
+        text-decoration: none;
+        font-size: 18px;
+        margin-right: 10px;
+        color: #333;
+        
+    }
+
+    #back{
+        background-color: #006b80;
+        color: white;
+        padding: 9px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-left: 10px;
+    }
+
+    form {
+        background-color: #fff;
+        padding: 18px 22px;
+        width: 420px;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin: 15px auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    td {
+        padding: 7px 5px;
+        text-align: left;
+    }
+
+    td:first-child {
+        font-weight: bold;
+        width: 35%;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+        outline: none;
+        border-color: #0085A1;
+    }
+
+    input[type="submit"] {
+        background-color: #006b80;
+        color: white;
+        padding: 9px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+</style>
 </head>
 <body>
     <h2><?php echo $label; ?> Expense</h2>
-    <a href="expense.php">Back</a><br><br>
+    
     <form method="post">
         <table>
             <tr>
@@ -94,8 +195,10 @@ if(isset($_POST["submit"])){
 
             <tr>
                 <td></td>
-                <td><input type="submit" name="submit" value="Submit"></td>
+                <td><input type="submit" name="submit" value="Submit"><a href="expense.php" id="back">Back</a></td>
             </tr>
+
+            
         </table>
     </form>
     <?php echo $msg; ?>

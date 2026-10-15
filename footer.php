@@ -7,11 +7,13 @@ include_once ("functions.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>Footer</title> -->
+    <style>
+        
+    </style>
 </head>
 
 <body>
-    @copyright
+    <p>@copyright</p>
     <?php
         echo date('Y');
     ?>
@@ -21,6 +23,11 @@ include_once ("functions.php");
         var category_id = document.getElementById("category_id").value;
         console.log(category_id);
         window.location.href="?category_id="+category_id;
+    }
+
+    function set_to_date(){
+        var from_date=document.getElementById("from_date").value;
+        document.getElementById("to_date").setAttribute("min", from_date);
     }
 </script>
 
